@@ -7,7 +7,7 @@ if (!apiKey) {
 }
 
 export const genAI = new GoogleGenerativeAI(apiKey);
-export const geminiModel = genAI.getGenerativeModel({ model: 'gemini-pro' });
+export const geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
 export async function convertCodeWithGemini(
   inputCode: string,
