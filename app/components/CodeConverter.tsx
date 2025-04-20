@@ -38,13 +38,13 @@ export default function CodeConverter() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Input Column */}
-                <div className="border rounded-lg p-4 bg-gray-50">
+                <div className="border rounded-lg p-4">
                     <div className="flex justify-between mb-2">
                         <h2 className="text-lg font-semibold">Input</h2>
                         <select 
                             value={inputLanguage}
                             onChange={(e) => setInputLanguage(e.target.value)}
-                            className="border rounded px-2 py-1 text-sm"
+                            className="border rounded px-2 py-1 text-sm bg-black"
                             aria-label="Select input programming language"
                         >
                             {languages.map(lang => (
@@ -53,7 +53,7 @@ export default function CodeConverter() {
                         </select>
                     </div>
                     <textarea
-                        className="w-full h-80 p-3 border rounded font-mono text-sm bg-white"
+                        className="w-full h-80 p-3 border rounded font-mono text-sm "
                         value={inputCode}
                         onChange={(e) => setInputCode(e.target.value)}
                         placeholder={`Enter your ${inputLanguage} code here...`}
@@ -61,13 +61,13 @@ export default function CodeConverter() {
                 </div>
                 
                 {/* Output Column */}
-                <div className="border rounded-lg p-4 bg-gray-50">
+                <div className="border rounded-lg p-4">
                     <div className="flex justify-between mb-2">
                         <h2 className="text-lg font-semibold">Output</h2>
                         <select 
                             value={outputLanguage}
                             onChange={(e) => setOutputLanguage(e.target.value)}
-                            className="border rounded px-2 py-1 text-sm"
+                            className="border rounded px-2 py-1 text-sm bg-black"
                             aria-label="Select output programming language"
                         >
                             {languages.map(lang => (
@@ -76,7 +76,7 @@ export default function CodeConverter() {
                         </select>
                     </div>
                     <textarea
-                        className="w-full h-80 p-3 border rounded font-mono text-sm bg-white"
+                        className="w-full h-80 p-3 border rounded font-mono text-sm "
                         value={outputCode}
                         readOnly
                         placeholder={`Converted ${outputLanguage} code will appear here...`}
