@@ -15,8 +15,17 @@ export default function CodeConverter() {
     
     const languages = ['JavaScript', 'Python', 'Java', 'C++', 'TypeScript', 'PHP', 'Go', 'Ruby', 'C#', 'Swift'];
     
+    // Check if input and output languages are the same
+    const areSameLanguages = inputLanguage === outputLanguage;
+    
     async function convertCode() {
         if (!inputCode.trim()) return;
+        
+        // If languages are the same, copy input to output without API call
+        if (areSameLanguages) {
+            setOutputCode(inputCode);
+            return;
+        }
         
         setIsConverting(true);
         
@@ -76,6 +85,11 @@ export default function CodeConverter() {
                             ))}
                         </Select>
                     </div>
+                    {areSameLanguages && inputCode.trim() && (
+                        <div className="mb-2 px-2 py-1.5 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100 text-sm rounded-md">
+                            Input and output languages are the same. No conversion needed.
+                        </div>
+                    )}
                     <Textarea
                         className="font-mono min-h-[20rem] resize-none bg-muted/50"
                         value={outputCode}
@@ -93,7 +107,7 @@ export default function CodeConverter() {
                     size="lg"
                     className="w-full max-w-xs"
                 >
-                    {isConverting ? 'Converting...' : 'Convert Code'}
+                    {areSameLanguages ? 'Copy Code' : (isConverting ? 'Converting...' : 'Convert Code')}
                 </Button>
             </div>
         </div>
