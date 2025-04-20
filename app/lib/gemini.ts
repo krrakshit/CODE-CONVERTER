@@ -9,11 +9,34 @@ if (!apiKey) {
 export const genAI = new GoogleGenerativeAI(apiKey);
 export const geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
+// Cache for storing previous conversions
+type CacheKey = string;
+type ConversionCache = {
+  [key: CacheKey]: string;
+};
+
+// Initialize cache
+const conversionCache: ConversionCache = {};
+
+// Generate a cache key from conversion parameters
+function generateCacheKey(inputCode: string, inputLanguage: string, outputLanguage: string): CacheKey {
+  return `${inputLanguage}_${outputLanguage}_${inputCode}`;
+}
+
 export async function convertCodeWithGemini(
   inputCode: string,
   inputLanguage: string,
   outputLanguage: string
 ): Promise<string> {
+  // Generate cache key
+  const cacheKey = generateCacheKey(inputCode, inputLanguage, outputLanguage);
+  
+  // Check if result exists in cache
+  if (conversionCache[cacheKey]) {
+    console.log('Using cached conversion result');
+    return conversionCache[cacheKey];
+  }
+  
   try {
     const prompt = `Convert the following ${inputLanguage} code to ${outputLanguage}:
     
@@ -33,6 +56,9 @@ export async function convertCodeWithGemini(
       const codeMatch = text.match(/```(?:\w+)?\s*([\s\S]*?)```/);
       cleanedCode = codeMatch ? codeMatch[1].trim() : text;
     }
+    
+    // Store in cache
+    conversionCache[cacheKey] = cleanedCode;
     
     return cleanedCode;
   } catch (error) {

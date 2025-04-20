@@ -1,10 +1,21 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { convertCodeWithGemini } from '../lib/gemini';
 import { Button } from './ui/button';
 import { Select } from './ui/select';
 import { Textarea } from './ui/textarea';
+
+// Cache for user input
+type InputCache = {
+  [key: string]: {
+    code: string;
+    timestamp: number;
+  };
+};
+
+// Cache expiration time (7 days in milliseconds)
+const CACHE_EXPIRATION = 7 * 24 * 60 * 60 * 1000;
 
 export default function CodeConverter() {
     const [inputCode, setInputCode] = useState('');
@@ -12,11 +23,87 @@ export default function CodeConverter() {
     const [inputLanguage, setInputLanguage] = useState('JavaScript');
     const [outputLanguage, setOutputLanguage] = useState('Python');
     const [isConverting, setIsConverting] = useState(false);
+    const [inputCache, setInputCache] = useState<InputCache>({});
     
     const languages = ['JavaScript', 'Python', 'Java', 'C++', 'TypeScript', 'PHP', 'Go', 'Ruby', 'C#', 'Swift'];
     
     // Check if input and output languages are the same
     const areSameLanguages = inputLanguage === outputLanguage;
+    
+    // Load saved preferences and cache from localStorage
+    useEffect(() => {
+        // Load language preferences
+        const savedInputLang = localStorage.getItem('inputLanguage');
+        const savedOutputLang = localStorage.getItem('outputLanguage');
+        
+        if (savedInputLang) setInputLanguage(savedInputLang);
+        if (savedOutputLang) setOutputLanguage(savedOutputLang);
+        
+        // Load input code cache
+        const savedCache = localStorage.getItem('codeInputCache');
+        if (savedCache) {
+            try {
+                const parsedCache = JSON.parse(savedCache) as InputCache;
+                
+                // Clean expired cache entries
+                const now = Date.now();
+                const cleanedCache: InputCache = {};
+                
+                Object.keys(parsedCache).forEach(key => {
+                    if (now - parsedCache[key].timestamp < CACHE_EXPIRATION) {
+                        cleanedCache[key] = parsedCache[key];
+                    }
+                });
+                
+                setInputCache(cleanedCache);
+                
+                // Restore last input if available for the selected language
+                if (savedInputLang && cleanedCache[savedInputLang]) {
+                    setInputCode(cleanedCache[savedInputLang].code);
+                }
+            } catch (error) {
+                console.error('Error parsing cache:', error);
+                localStorage.removeItem('codeInputCache');
+            }
+        }
+    }, []);
+    
+    // Save language preferences when they change
+    useEffect(() => {
+        localStorage.setItem('inputLanguage', inputLanguage);
+        localStorage.setItem('outputLanguage', outputLanguage);
+    }, [inputLanguage, outputLanguage]);
+    
+    // Update cache when input code changes
+    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const newCode = e.target.value;
+        setInputCode(newCode);
+        
+        // Only cache non-empty input
+        if (newCode.trim()) {
+            const updatedCache = {
+                ...inputCache,
+                [inputLanguage]: {
+                    code: newCode,
+                    timestamp: Date.now()
+                }
+            };
+            
+            setInputCache(updatedCache);
+            localStorage.setItem('codeInputCache', JSON.stringify(updatedCache));
+        }
+    };
+    
+    // Handle language change and load cached input if available
+    const handleInputLangChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newLang = e.target.value;
+        setInputLanguage(newLang);
+        
+        // Load cached input for the selected language if available
+        if (inputCache[newLang]) {
+            setInputCode(inputCache[newLang].code);
+        }
+    };
     
     async function convertCode() {
         if (!inputCode.trim()) return;
@@ -53,7 +140,7 @@ export default function CodeConverter() {
                         <h2 className="text-lg font-semibold">Input</h2>
                         <Select 
                             value={inputLanguage}
-                            onChange={(e) => setInputLanguage(e.target.value)}
+                            onChange={handleInputLangChange}
                             aria-label="Select input programming language"
                             className="w-40"
                         >
@@ -65,7 +152,7 @@ export default function CodeConverter() {
                     <Textarea
                         className="font-mono min-h-[20rem] resize-none"
                         value={inputCode}
-                        onChange={(e) => setInputCode(e.target.value)}
+                        onChange={handleInputChange}
                         placeholder={`Enter your ${inputLanguage} code here...`}
                     />
                 </div>
