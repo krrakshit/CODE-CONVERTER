@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Code Converter
+
+A web application that allows you to convert code between different programming languages using Google's Gemini AI.
+
+## Features
+
+- Two-column layout for code input and output
+- Support for multiple programming languages
+- Real-time code conversion using Google Gemini AI
+- Responsive design that works on desktop and mobile
+
+## Supported Languages
+
+- JavaScript
+- Python
+- Java
+- C++
+- TypeScript
+- PHP
+- Go
+- Ruby
+- C#
+- Swift
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18.x or higher
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/code-converter.git
+cd code-converter
+```
+
+2. Install dependencies
+```bash
+npm install
+# or
+yarn
+```
+
+3. Set up your Gemini API key
+   - Get your API key from [Google Maker Suite](https://makersuite.google.com/app/apikey)
+   - Create a `.env.local` file in the root directory
+   - Add your API key:
+   ```
+   NEXT_PUBLIC_GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+
+4. Run the development server
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Select the input language from the dropdown
+2. Enter or paste your code in the left column
+3. Select the output language from the dropdown 
+4. Click the "Convert Code" button
+5. View the converted code in the right column
 
-## Learn More
+## Technologies Used
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Google Gemini AI API
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License - see the LICENSE file for details.
