@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { convertCodeWithGemini } from '../lib/gemini';
+import { convertCodeWithGemini, explainCodeWithGemini } from '../lib/gemini';
 import { Button } from './ui/button';
 import { Select } from './ui/select';
 import { Textarea } from './ui/textarea';
@@ -24,6 +24,9 @@ export default function CodeConverter() {
     const [outputLanguage, setOutputLanguage] = useState('Python');
     const [isConverting, setIsConverting] = useState(false);
     const [inputCache, setInputCache] = useState<InputCache>({});
+    const [explanation, setExplanation] = useState('');
+    const [isExplaining, setIsExplaining] = useState(false);
+    const [showExplanation, setShowExplanation] = useState(false);
     
     const languages = [
         'JavaScript',
@@ -124,6 +127,10 @@ export default function CodeConverter() {
             setInputCache(updatedCache);
             localStorage.setItem('codeInputCache', JSON.stringify(updatedCache));
         }
+        // Reset explanation when input changes
+        if (showExplanation) {
+            setShowExplanation(false);
+        }
     };
     
     // Handle language change and load cached input if available
@@ -134,6 +141,10 @@ export default function CodeConverter() {
         // Load cached input for the selected language if available
         if (inputCache[newLang]) {
             setInputCode(inputCache[newLang].code);
+        }
+        // Reset explanation when language changes
+        if (showExplanation) {
+            setShowExplanation(false);
         }
     };
     
@@ -160,6 +171,29 @@ export default function CodeConverter() {
             setOutputCode('An error occurred during code conversion. Please try again.');
         } finally {
             setIsConverting(false);
+        }
+    }
+    
+    async function explainCode() {
+        if (!inputCode.trim()) return;
+        
+        setIsExplaining(true);
+        setShowExplanation(true);
+        
+        try {
+            const codeToExplain = areSameLanguages ? inputCode : outputCode;
+            const languageToExplain = areSameLanguages ? inputLanguage : outputLanguage;
+            
+            const codeExplanation = await explainCodeWithGemini(
+                codeToExplain,
+                languageToExplain
+            );
+            setExplanation(codeExplanation);
+        } catch (error) {
+            console.error('Error explaining code:', error);
+            setExplanation('An error occurred while generating the explanation. Please try again.');
+        } finally {
+            setIsExplaining(false);
         }
     }
     
@@ -218,7 +252,7 @@ export default function CodeConverter() {
                 </div>
             </div>
             
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-4">
                 <Button
                     onClick={convertCode}
                     disabled={isConverting || !inputCode.trim()}
@@ -228,7 +262,33 @@ export default function CodeConverter() {
                 >
                     {areSameLanguages ? 'Copy Code' : (isConverting ? 'Converting...' : 'Convert Code')}
                 </Button>
+                
+                <Button
+                    onClick={explainCode}
+                    disabled={isExplaining || (!inputCode.trim() && !outputCode.trim())}
+                    variant="outline"
+                    size="lg"
+                    className="w-full max-w-xs"
+                >
+                    {isExplaining ? 'Explaining...' : 'Explain Code'}
+                </Button>
             </div>
+            
+            {/* Explanation Section */}
+            {showExplanation && (
+                <div className="rounded-lg border bg-card p-4 shadow-sm mt-6">
+                    <h2 className="text-lg font-semibold mb-3">Code Explanation</h2>
+                    {isExplaining ? (
+                        <div className="h-40 flex items-center justify-center">
+                            <p className="text-muted-foreground">Generating explanation...</p>
+                        </div>
+                    ) : (
+                        <div className="prose dark:prose-invert max-w-none">
+                            <div dangerouslySetInnerHTML={{ __html: explanation.replace(/\n/g, '<br/>') }} />
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 } 

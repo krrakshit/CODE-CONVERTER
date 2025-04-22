@@ -65,4 +65,59 @@ export async function convertCodeWithGemini(
     console.error('Error converting code:', error);
     throw new Error('Failed to convert code. Please check your API key and try again.');
   }
+}
+
+// Cache for storing previous explanations
+type ExplanationCacheKey = string;
+type ExplanationCache = {
+  [key: ExplanationCacheKey]: string;
+};
+
+// Initialize explanation cache
+const explanationCache: ExplanationCache = {};
+
+// Generate a cache key for explanations
+function generateExplanationCacheKey(code: string, language: string): ExplanationCacheKey {
+  return `${language}_explanation_${code}`;
+}
+
+export async function explainCodeWithGemini(
+  code: string,
+  language: string
+): Promise<string> {
+  // Generate cache key
+  const cacheKey = generateExplanationCacheKey(code, language);
+  
+  // Check if result exists in cache
+  if (explanationCache[cacheKey]) {
+    console.log('Using cached explanation result');
+    return explanationCache[cacheKey];
+  }
+  
+  try {
+    const prompt = `Explain the following ${language} code in detail:
+    
+    \`\`\`${language}
+    ${code}
+    \`\`\`
+    
+    Provide a clear explanation that focuses on:
+    1. What the code does
+    2. How it works step-by-step
+    3. Any key concepts or patterns used
+    
+    Make the explanation accessible to someone learning this language.`;
+    
+    const result = await geminiModel.generateContent(prompt);
+    const response = await result.response;
+    const explanation = response.text().replace(/\**/g, '');
+    
+    // Store in cache
+    explanationCache[cacheKey] = explanation;
+    
+    return explanation;
+  } catch (error) {
+    console.error('Error explaining code:', error);
+    throw new Error('Failed to explain code. Please check your API key and try again.');
+  }
 } 
