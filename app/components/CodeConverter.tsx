@@ -25,7 +25,39 @@ export default function CodeConverter() {
     const [isConverting, setIsConverting] = useState(false);
     const [inputCache, setInputCache] = useState<InputCache>({});
     
-    const languages = ['JavaScript', 'Python', 'Java', 'C++', 'TypeScript', 'PHP', 'Go', 'Ruby', 'C#', 'Swift'];
+    const languages = [
+        'JavaScript',
+        'Python',
+        'Java',
+        'C++',
+        'TypeScript',
+        'PHP',
+        'Go',
+        'Ruby',
+        'C#',
+        'Swift',
+        'Kotlin',
+        'Rust',
+        'Dart',
+        'Scala',
+        'Perl',
+        'Objective-C',
+        'Haskell',
+        'Elixir',
+        'Lua',
+        'R',
+        'MATLAB',
+        'Shell',
+        'Assembly',
+        'SQL',
+        'Groovy',
+        'F#',
+        'C',
+        'Erlang',
+        'V',
+        'Julia'
+      ];
+      
     
     // Check if input and output languages are the same
     const areSameLanguages = inputLanguage === outputLanguage;
