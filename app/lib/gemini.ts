@@ -111,6 +111,7 @@ export async function explainCodeWithGemini(
     const result = await geminiModel.generateContent(prompt);
     const response = await result.response;
     const explanation = response.text().replace(/\**/g, '');
+    console.log(explanation)
     
     // Store in cache
     explanationCache[cacheKey] = explanation;

@@ -15,7 +15,8 @@ export function Hero() {
     </BackgroundLines>
     <div className="container mx-auto py-8">
             <CodeConverter />
-        </div>
+            </div>
+          
     </div>
   );
 }
